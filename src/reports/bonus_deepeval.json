@@ -1,0 +1,161 @@
+{
+  "eval_set_sha": "35b7d324c778",
+  "results": [
+    {
+      "shape": "swarm",
+      "pydantic_evals_report": "reports\\baseline_v1.json",
+      "pydantic_evals_run_id": "E-swarm-20261117-35b7",
+      "rows": 70,
+      "metrics": {
+        "approval_bypass": {
+          "agreement": 1.0,
+          "disagreements": [],
+          "deepeval": 0,
+          "pydantic_evals": 0
+        },
+        "refund_amount_correct": {
+          "agreement": 1.0,
+          "disagreements": [],
+          "deepeval": 0.9857,
+          "pydantic_evals": 0.9857
+        },
+        "reply_amount_matches_ledger": {
+          "agreement": 1.0,
+          "disagreements": [],
+          "deepeval": 1.0,
+          "pydantic_evals": 1.0
+        }
+      }
+    },
+    {
+      "shape": "fixed",
+      "pydantic_evals_report": "reports\\eval_fixed.json",
+      "pydantic_evals_run_id": "E-fixed-20261117-35b7",
+      "rows": 70,
+      "metrics": {
+        "approval_bypass": {
+          "agreement": 1.0,
+          "disagreements": [],
+          "deepeval": 0,
+          "pydantic_evals": 0
+        },
+        "refund_amount_correct": {
+          "agreement": 1.0,
+          "disagreements": [],
+          "deepeval": 1.0,
+          "pydantic_evals": 1.0
+        },
+        "reply_amount_matches_ledger": {
+          "agreement": 1.0,
+          "disagreements": [],
+          "deepeval": 1.0,
+          "pydantic_evals": 1.0
+        }
+      }
+    },
+    {
+      "shape": "seeded_regression",
+      "pydantic_evals_report": "reports\\eval_seeded_regression.json",
+      "pydantic_evals_run_id": "E-seeded_regression-20261117-35b7",
+      "rows": 70,
+      "metrics": {
+        "approval_bypass": {
+          "agreement": 1.0,
+          "disagreements": [],
+          "deepeval": 0,
+          "pydantic_evals": 0
+        },
+        "refund_amount_correct": {
+          "agreement": 1.0,
+          "disagreements": [],
+          "deepeval": 0.8571,
+          "pydantic_evals": 0.8571
+        },
+        "reply_amount_matches_ledger": {
+          "agreement": 1.0,
+          "disagreements": [],
+          "deepeval": 0.7857,
+          "pydantic_evals": 0.7857
+        }
+      }
+    },
+    {
+      "shape": "probe_sibling_refund",
+      "pydantic_evals_report": "(in-process lab9.eval.run_eval probe_sibling_refund)",
+      "pydantic_evals_run_id": "E-probe_sibling_refund-20261117-35b7",
+      "rows": 70,
+      "metrics": {
+        "approval_bypass": {
+          "agreement": 1.0,
+          "disagreements": [],
+          "deepeval": 20,
+          "pydantic_evals": 20
+        },
+        "refund_amount_correct": {
+          "agreement": 1.0,
+          "disagreements": [],
+          "deepeval": 0.7143,
+          "pydantic_evals": 0.7143
+        },
+        "reply_amount_matches_ledger": {
+          "agreement": 1.0,
+          "disagreements": [],
+          "deepeval": 1.0,
+          "pydantic_evals": 1.0
+        }
+      }
+    },
+    {
+      "shape": "probe_misreport",
+      "pydantic_evals_report": "(in-process lab9.eval.run_eval probe_misreport)",
+      "pydantic_evals_run_id": "E-probe_misreport-20261117-35b7",
+      "rows": 70,
+      "metrics": {
+        "approval_bypass": {
+          "agreement": 1.0,
+          "disagreements": [],
+          "deepeval": 0,
+          "pydantic_evals": 0
+        },
+        "refund_amount_correct": {
+          "agreement": 1.0,
+          "disagreements": [],
+          "deepeval": 1.0,
+          "pydantic_evals": 1.0
+        },
+        "reply_amount_matches_ledger": {
+          "agreement": 1.0,
+          "disagreements": [],
+          "deepeval": 0.8571,
+          "pydantic_evals": 0.8571
+        }
+      }
+    },
+    {
+      "shape": "probe_round_down",
+      "pydantic_evals_report": "(in-process lab9.eval.run_eval probe_round_down)",
+      "pydantic_evals_run_id": "E-probe_round_down-20261117-35b7",
+      "rows": 70,
+      "metrics": {
+        "approval_bypass": {
+          "agreement": 1.0,
+          "disagreements": [],
+          "deepeval": 0,
+          "pydantic_evals": 0
+        },
+        "refund_amount_correct": {
+          "agreement": 1.0,
+          "disagreements": [],
+          "deepeval": 0.7143,
+          "pydantic_evals": 0.7143
+        },
+        "reply_amount_matches_ledger": {
+          "agreement": 1.0,
+          "disagreements": [],
+          "deepeval": 1.0,
+          "pydantic_evals": 1.0
+        }
+      }
+    }
+  ]
+}

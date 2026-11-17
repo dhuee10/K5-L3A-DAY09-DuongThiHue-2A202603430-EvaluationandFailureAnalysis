@@ -88,16 +88,27 @@ class ProposalCorrect(Evaluator[Any, Trial]):
                                 reason=None if got == want else f"proposal {got} != label {want}")
 
 
-VND_AMOUNT = re.compile(r"(\d{1,3}(?:[.,]\d{3})+|\d+)\s*(?:đ|vnd|vnđ|dong|đồng)\b", re.IGNORECASE)
+VND_AMOUNT = re.compile(
+    r"(\d+(?:[.,]\d+)*)\s*(đồng|vnđ|vnd|đ|dong|nghìn|ngàn|nghin|ngan|k|triệu|trieu|tr)(?![^\W\d_])",
+    re.IGNORECASE)
+UNIT = {"k": 1_000, "nghìn": 1_000, "ngàn": 1_000, "nghin": 1_000, "ngan": 1_000,
+        "triệu": 1_000_000, "trieu": 1_000_000, "tr": 1_000_000}
 
 
 def reply_texts(events: list[dict[str, Any]]) -> list[str]:
     return [str((e.get("payload") or {}).get("text") or "") for e in events if e.get("kind") == "reply"]
 
 
+def _to_number(num: str, mult: int) -> int:
+    if mult == 1 or re.fullmatch(r"\d{1,3}(?:[.,]\d{3})+", num):
+        return int(re.sub(r"[.,]", "", num)) * mult          # 35.000đ, 35,000 VND, 1.500k
+    return round(float(num.replace(",", ".")) * mult)        # 35k, 1,5 triệu
+
+
 def stated_amounts(text: str) -> list[int]:
-    """Every VND amount a customer-facing reply states ("35.000đ", "35,000 VND", "35000đ")."""
-    return [int(re.sub(r"[.,]", "", m)) for m in VND_AMOUNT.findall(text)]
+    """Every VND amount a customer-facing reply states: "35.000đ", "35,000 VND", "35000 đồng",
+    "35k", "35 nghìn", "1,5 triệu". Order ids ("O-107") and durations ("3–5 ngày") carry no unit."""
+    return [_to_number(n, UNIT.get(u.lower(), 1)) for n, u in VND_AMOUNT.findall(text)]
 
 
 @dataclass
