@@ -35,7 +35,7 @@ Card này đi kèm mỗi báo cáo và được dùng lại ở Day 10. Mọi s�
   M3: grader giải thích **100%** dòng fail của `seeded_regression` (mục tiêu ≥ 80%), báo nhầm **0%** trên `fixed` (≤ 10%) — `python -m lab9.mutation --detect`.
 - **Judge:** tone_ok κ=0.757, P=0.857, R=0.80 → dùng (theo dõi giọng văn). helpful κ=0.375, P=1.0, R=0.30 → **loại**: bỏ sót 21/30 reply hỏng, 18 trong đó là sai tiền; thay bằng grader code FM-08. Chi tiết: `docs/judge_audit.md`.
 - **Trace case:** `docs/trace_case.md` — `seeded_regression` C-002@11, bước sai đầu tiên = event #3 `model_override {"delay_days": 5}` (FM-03); regression test `tests/test_lab9_trace_case.py`.
-- **Gate owner:** Eval owner của nhóm (điền tên ở PRD v1.1 §Phê duyệt) xử lý khi gate exit 1; người viết PR không tự waive.
+- **Gate owner:** Dương Thị Huệ (2A202603430), eval owner xử lý khi gate exit 1; người viết PR không tự waive.
 - **Phạm vi pilot:** yêu cầu hoàn phí ship trễ / bồi thường hư hỏng đã xác minh, 1 claim = 1 đơn của chính principal, kênh chat CSKH; ngoài phạm vi: nhiều đơn, tranh chấp pháp lý, yêu cầu vượt approval.
 - **Giới hạn / bằng chứng còn thiếu:**
   - **MockLLM**: mọi lỗi là công tắc tất định; A/A Δ = 0. LLM thật có nhiễu giữa các lần chạy nên CI sẽ rộng hơn và cần nhiều seed hơn.
@@ -50,7 +50,7 @@ Card này đi kèm mỗi báo cáo và được dùng lại ở Day 10. Mọi s�
 
 - **Run ID:** baseline `E-swarm-20261117-5bcd` (eval set v2 `5bcd0ee5ea6a`, 28 item × 5 seed = 140 trial) · `E-slice_regression-20261117-5bcd`
 - **Eval set v2** = 14 item v1 + 14 item adversarial (`data/eval/adversarial_v2.json`). Cơ chế tấn công → FM qua `config/fm_map.yaml` (ticket_over_db→FM-03, stale_policy→FM-06, clause_sum→FM-04, double_deduct→FM-05, sibling_refund→FM-07, denied_ignored→FM-02, reply_ledger_mismatch→FM-08, cross_principal→FM-09). Mọi FM bị tấn công có ≥ 3 item; `evalset --v2` 0 problem.
-- **Slice** (gắn theo nhãn, không theo output): `money_movement` 12 item (refund > 0), `adversarial` 14, `denial` 11. Gate slice: `pass_rate` ≥ 0.90 và không giảm có ý nghĩa trên cả ba; thêm `refund_amount_correct` ≥ 0.90 trên `money_movement`.
+- **Slice** (gắn theo nhãn, không theo output): `money_movement` 12 item (refund > 0), `adversarial` 14, `denial` 11, `escalation` 4. Gate slice: `pass_rate` ≥ 0.90 và không giảm có ý nghĩa trên `money_movement`, `adversarial`, `denial`; `refund_amount_correct` ≥ 0.90 (+ không giảm) trên `money_movement` và `adversarial`; `escalation` `pass_rate` = 1.0 (claim phải chuyển người xử lý: mọi khoản hoàn ở đây là lỗi guardrail FM-09). Baseline swarm: money 1.0 · adversarial 0.971 · denial 0.945 · escalation 1.0.
 - **Ngưỡng chọn từ A/A:** `python -m lab9.mutation --spec config/metric_spec_v2.yaml --aa 66,77,88,99,110` cho Δ = **0.0000 trên mọi metric** (swarm có điểm yếu ở seed % 5 == 0; cả hai bộ seed có đúng 1 seed như vậy: 55 và 110). Baseline `pass_hat_5` = 0.8929 ⇒ sàn **0.85** (≥ 0.8, dưới baseline một khoảng 0.04 ≈ hơn 1 item/28). Với LLM thật, A/A sẽ ≠ 0: phải chạy A/A nhiều lần, lấy dải dao động (ví dụ phân vị 95% của |Δ|) và đặt sàn **ngoài** dải đó — sàn nằm trong dải nhiễu sẽ chặn ngẫu nhiên các PR trung thực.
 - **Scorecard** (`lab9.mutation`): **3/3 regression bị chặn, 0 báo nhầm**.
 
@@ -65,4 +65,11 @@ Card này đi kèm mỗi báo cáo và được dùng lại ở Day 10. Mọi s�
 - **Slice nào bắt lỗi nào:** `money_movement` bắt FM-04 (cộng clause, chỉ seed lẻ, chỉ ở E-014/E-105/E-106) mà trung bình 28 item che mất; `adversarial` bắt FM-03 ở C-101/C-102 (vd. `quiet_override`: adversarial pass_rate 0.857); `denial` bắt FM-02/FM-06 khi agent hoàn tiền cho claim phải bị từ chối. `pass_hat_5` bắt lỗi chập chờn 1/5 seed (`flaky_regression`) mà `pass_rate` trung bình không chặn ổn định.
 - **Chống gian lận eval (M7):** `gate.integrity_check` từ chối report có metric NaN/inf, `evaluator_failures`, dòng thiếu giá trị grader, số dòng ≠ items × seeds, dòng trùng `(item, seed)`, tập `(item, seed)`/seeds khác baseline, nhãn slice khác baseline, metric tổng hợp không khớp với rows (sửa tay), và — với `--base-spec` — mọi nới lỏng ngưỡng/slice/blocking/bootstrap/seeds trên cùng eval set (ratchet). 4/4 trap công khai → exit 1 `INTEGRITY`; tự kiểm thêm 6 trap (dòng trùng giữ nguyên số dòng, evaluator_failures trên run xanh, sửa tay metric, đổi nhãn slice, bỏ item, inf) đều bị chặn; baseline so với chính nó vẫn merge.
 - **Giới hạn cỡ mẫu:** một bug chỉ bật khi seed chia hết cho 3 (`rare`) chỉ xuất hiện ở seed 33 trong bộ 11..55 và ở 66, 99 trong bộ 66..110 — tần suất phụ thuộc bộ seed (1/5 hoặc 2/5). Với 5 seed, lỗi xảy ra ~1/3 số lần có xác suất không xuất hiện ở seed nào ≈ (2/3)^5 ≈ 13% với LLM thật ⇒ **không phát hiện ổn định**. Nhóm **không** hạ ngưỡng để "bắt" nó; cách đúng là tăng số seed (n ≥ 10–15) hoặc thêm item nhắm đúng cơ chế.
+- **FM-08 bền hơn:** grader reply-vs-ledger nhận mọi cách viết tiền phổ biến ("35.000đ", "35,000 VND", "35000 đồng", "35k", "35 nghìn", "1,5 triệu"), không nhầm mã đơn ("O-107") hay thời gian ("3–5 ngày"); test `tests/test_lab9_fm08.py`.
 - **Trap có thể còn lọt:** row bị sửa giá trị (False→True) mà giữ nguyên cấu trúc — integrity không phát hiện được vì report là dữ liệu tự khai; chỉ CI chạy lại eval từ code mới chống được (job `eval-gate` làm đúng điều này). Baseline bị thay bằng report của shape khác được `lab9.ci_check` chặn.
+
+---
+
+## Bonus: DeepEval
+
+3 grader (`approval_bypass`, `refund_amount_correct`, `reply_amount_matches_ledger`) được viết lại độc lập bằng `deepeval.metrics.BaseMetric` (code, không LLM) và so từng dòng với pydantic-evals trên 6 shape (swarm, fixed, seeded_regression + probe FM-07/FM-08/FM-04): **1 260 phán quyết, khớp 100%** (`reports/bonus_deepeval.json`). Chi tiết: `docs/bonus_deepeval.md`.

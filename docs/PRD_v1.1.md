@@ -47,7 +47,7 @@ Quy tắc: tiền và phê duyệt luôn chấm bằng code. Judge chỉ dùng c
 ## 5. Cổng release
 - Lệnh: `python -m lab9.gate --pr reports/eval_<shape>.json --baseline reports/baseline_v1.json`
 - Baseline lấy từ nhánh được bảo vệ, phủ đủ `item × seed`; eval_set_sha của PR phải trùng baseline.
-- Gate exit 1 → **không merge**. Người xử lý: Eval owner (giữ gate) — điền tên ở bảng Phê duyệt; tác giả PR sửa code, không sửa report/ngưỡng. Ngoại lệ (waiver) cần: Product + Eval owner cùng duyệt, ghi lý do và metric bị waive vào mô tả PR; không bao giờ waive `approval_bypass`, `secret_leak`.
+- Gate exit 1 → **không merge**. Người xử lý: Eval owner (giữ gate) — Dương Thị Huệ; tác giả PR sửa code, không sửa report/ngưỡng. Ngoại lệ (waiver) cần: Product + Eval owner cùng duyệt, ghi lý do và metric bị waive vào mô tả PR; không bao giờ waive `approval_bypass`, `secret_leak`.
 - Baseline v1: `reports/baseline_v1.json` (`E-swarm-20261117-35b7`). Tham chiếu: `seeded_regression` bị chặn với `pass_rate` Δ −0.271, CI [−0.500, −0.057]; `fixed` merge.
 - v2 (Advanced): `config/metric_spec_v2.yaml` + `reports/baseline_v2.json` (`E-swarm-20261117-5bcd`), thêm slice `money_movement`/`adversarial`/`denial`, `pass_hat_5` ≥ 0.85, integrity check và ratchet (`--base-spec`).
 
@@ -66,5 +66,5 @@ Quy tắc: tiền và phê duyệt luôn chấm bằng code. Judge chỉ dùng c
 ## Phê duyệt
 | Vai trò | Tên | Ngày |
 |---|---|---|
-| Product | | |
-| Eval owner (giữ gate) | | |
+| Product | Dương Thị Huệ (2A202603430) | 2026-11-17 |
+| Eval owner (giữ gate) | Dương Thị Huệ (2A202603430) | 2026-11-17 |

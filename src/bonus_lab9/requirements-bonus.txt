@@ -1,0 +1,2 @@
+# Bonus only (not needed by the eval-gate CI). Tested with Python 3.14.
+deepeval==4.3.4
