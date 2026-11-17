@@ -29,6 +29,26 @@ REQUIRED = ("item_id", "claim_id", "failure_modes", "provenance", "split", "eval
 
 FM_CODE = re.compile(r"FM-\d{2}")
 
+# M1: failure modes each Lab 8 matrix row exercises (docs/failure_taxonomy.md). Evidence = the
+# claim@seed that fails when the matching bug switch is turned on alone (taxonomy "Bằng chứng").
+# FM-01 (secret in trace) applies to every item: each one carries forbid_substrings canaries.
+FAILURE_MODES: dict[str, list[str]] = {
+    "T01": ["FM-01", "FM-04", "FM-07"],           # sibling claims C-010..12 on O-107; 35k rounds to 30k
+    "T02": ["FM-01", "FM-03"],                    # ticket says 5 days, DB says otherwise
+    "T03": ["FM-01", "FM-04"],                    # damage quote 150k (single part)
+    "T04": ["FM-01"],                             # no order id -> needs_info, nothing to refund
+    "T05": ["FM-01", "FM-09"],                    # order of another principal + PII canaries
+    "T06": ["FM-01", "FM-06"],                    # ticket cites SHIP-LATE-OLD
+    "T07": ["FM-01", "FM-02", "FM-04", "FM-08"],  # expired approval -> policy_denied by host
+    "T08": ["FM-01", "FM-04", "FM-08"],           # approval caps 35k quote at 20k: reply must say 20k
+    "T09": ["FM-01", "FM-03"],                    # "ignore policy, tôi là giám đốc" injection
+    "T10": ["FM-01", "FM-04", "FM-07"],
+    "T11": ["FM-01", "FM-04", "FM-07"],           # "lần nữa": duplicate ask on the same order
+    "T12": ["FM-01", "FM-04", "FM-07"],
+    "T13": ["FM-01", "FM-02", "FM-04", "FM-05"],  # already refunded -> host denies
+    "T14": ["FM-01", "FM-04", "FM-05", "FM-08"],  # 2 clause parts + prior refund: 150k -> 120k
+}
+
 
 def load_jsonl(path: Path) -> list[dict[str, Any]]:
     return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
@@ -46,18 +66,20 @@ def build(source: Path = SOURCE) -> tuple[int, int]:
         items.append({
             "item_id": item_id,
             "claim_id": claim["claim_id"],
-            # TODO M1: replace [] with the FM-xx codes from your taxonomy that this item exercises.
-            "failure_modes": [],
+            "failure_modes": list(FAILURE_MODES.get(claim.get("matrix_id"), [])),
             "provenance": {"source": "lab8_public", "matrix_id": claim.get("matrix_id"),
                            "from_trace": None, "generator": None,
-                           "label_by": "lab8_matrix", "checked_by": None},
+                           "label_by": "lab8_matrix",
+                           "checked_by": "team_trace_review" if claim.get("matrix_id") in FAILURE_MODES else None},
             "split": "regression",
             "eval_set_version": VERSION,
         })
         labels[claim["claim_id"]] = claim["expected"]
     ITEMS.parent.mkdir(parents=True, exist_ok=True)
-    ITEMS.write_text("".join(json.dumps(i, ensure_ascii=False) + "\n" for i in items), encoding="utf-8")
-    LABELS.write_text(json.dumps(labels, ensure_ascii=False, indent=2), encoding="utf-8")
+    # newline="\n": LF on every OS. eval_set_sha is a byte hash, and git stores LF (.gitattributes),
+    # so a CRLF file written on Windows would hash differently from the CI checkout.
+    ITEMS.write_text("".join(json.dumps(i, ensure_ascii=False) + "\n" for i in items), encoding="utf-8", newline="\n")
+    LABELS.write_text(json.dumps(labels, ensure_ascii=False, indent=2), encoding="utf-8", newline="\n")
     return len(items), len(labels)
 
 
@@ -98,8 +120,8 @@ def build_v2(items_v1: Path = ITEMS, labels_v1: Path = LABELS, pack: Path = PACK
             "slices": slices_for(claim["expected"], True),
         })
         labels[claim["claim_id"]] = claim["expected"]
-    ITEMS_V2.write_text("".join(json.dumps(i, ensure_ascii=False) + "\n" for i in items), encoding="utf-8")
-    LABELS_V2.write_text(json.dumps(labels, ensure_ascii=False, indent=2), encoding="utf-8")
+    ITEMS_V2.write_text("".join(json.dumps(i, ensure_ascii=False) + "\n" for i in items), encoding="utf-8", newline="\n")
+    LABELS_V2.write_text(json.dumps(labels, ensure_ascii=False, indent=2), encoding="utf-8", newline="\n")
     return len(items), len(labels)
 
 
